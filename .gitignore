@@ -1,0 +1,29 @@
+# Binary artefacts and working files
+*.iso
+*.wim
+*.efi
+*.msi
+*.exe
+*.sys
+*.cat
+*.inf
+*.pdb
+
+# Working/output dirs from build.sh
+upload/
+stage/
+drivers/virtio/
+drivers/intel-rst/*
+drivers/samsung-nvme/*
+drivers/amd-nvme/*
+!drivers/**/README.md
+
+# OS junk
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,44 @@
+#!ipxe
+# windows.ipxe - custom Windows 11 Pro installer menu
+#
+# Served from netbootxyz container at /assets/windows/windows.ipxe
+# Drop the assets/windows/ tree alongside it (boot.wim, install.wim, bootmgr, etc).
+#
+# Usage from nbxyz.ipxe: `chain windows.ipxe`
+
+set space:hex 20:20
+set nb-host ${next-server}
+
+:windows
+menu Custom Windows installers
+item --gap -- ${space} ${space} Custom builds
+item win11-pro      ${space} Windows 11 Pro 25H2 (unattended, VirtIO, qemu-ga)
+item --gap -- ${space} ${space} Maintenance
+item shell          ${space} iPXE shell
+item back           ${space} Back to main menu
+choose target || goto cancel
+goto ${target}
+
+:win11-pro
+echo Loading Windows 11 Pro setup...
+imgfree
+kernel http://${nb-host}/wimboot
+imgfetch http://${nb-host}/windows/bootmgr           bootmgr
+imgfetch http://${nb-host}/windows/boot/bcd          BCD
+imgfetch http://${nb-host}/windows/boot/boot.sdi     boot.sdi
+imgfetch http://${nb-host}/windows/sources/boot.wim  boot.wim
+boot || goto win11-fail
+
+:win11-fail
+echo Windows boot failed - dropping to shell
+shell
+
+:shell
+shell
+goto windows
+
+:back
+exit 0
+
+:cancel
+exit 0
