@@ -18,6 +18,9 @@ drivers/samsung-nvme/*
 drivers/amd-nvme/*
 !drivers/**/README.md
 
+# Local config (router host, user, storage volume)
+local.env
+
 # OS junk
 .DS_Store
 .AppleDouble

@@ -5,8 +5,9 @@ Builds an unattended Windows 11 Pro installer with VirtIO drivers, QEMU
 guest agent auto-install, OOBE/Microsoft-account bypass, mild AppX debloat,
 and Chris Titus Tech WinUtil on first login.
 
-The router serves images and the iPXE menu over HTTP from a USB drive
-mounted at `/samsungssd2tb`.
+The router serves images and the iPXE menu over HTTP from a USB drive.
+The disk slot label is referenced throughout as `${STORAGE_VOLUME}` —
+configure it (along with the router host and SSH user) in `local.env`.
 
 ## Layout
 
@@ -33,9 +34,11 @@ docs/                       wiring notes
 On macOS with `wimlib` installed:
 
 ```
+cp local.env.example local.env
+$EDITOR local.env       # fill in ROUTER_HOST / ROUTER_USER / STORAGE_VOLUME
+
 brew install wimlib
-cd windows/scripts
-./build.sh
+windows/scripts/build.sh
 ```
 
 The script:
@@ -54,20 +57,24 @@ The script:
 
 The router needs:
 
-- A USB drive shared via SMB at `/samsungssd2tb`.
-- netboot.xyz container at `/samsungssd2tb/container-root/netbootxyz`.
+- A USB drive shared via SMB at `/${STORAGE_VOLUME}`.
+- netboot.xyz container at `/${STORAGE_VOLUME}/container-root/netbootxyz`.
 - Container needs to be on **netboot.xyz v3.x** (v2 has poor Windows support).
-  Rebuild via the GH Actions workflow for `ghcr.io/jr551/docker-netbootxyz:armv7`.
+  Rebuild via your own GH Actions workflow for
+  `ghcr.io/${GHCR_NAMESPACE}/docker-netbootxyz:armv7`.
 
-Then:
+With `local.env` filled in:
 
 ```
+# Source the env so $ROUTER_USER etc resolve
+. local.env
+
 # Files
-scp -r upload/windows/. jr551@192.168.69.1:samsungssd2tb/netbootxyz/assets/windows/
+scp -r upload/windows/. ${ROUTER_USER}@${ROUTER_HOST}:${STORAGE_VOLUME}/netbootxyz/assets/windows/
 
 # iPXE menu
-scp ipxe/nbxyz.ipxe   jr551@192.168.69.1:samsungssd2tb/netbootxyz/config/menus/nbxyz.ipxe
-scp ipxe/windows.ipxe jr551@192.168.69.1:samsungssd2tb/netbootxyz/assets/windows/windows.ipxe
+scp ipxe/nbxyz.ipxe   ${ROUTER_USER}@${ROUTER_HOST}:${STORAGE_VOLUME}/netbootxyz/config/menus/nbxyz.ipxe
+scp ipxe/windows.ipxe ${ROUTER_USER}@${ROUTER_HOST}:${STORAGE_VOLUME}/netbootxyz/assets/windows/windows.ipxe
 ```
 
 The container picks up the new `nbxyz.ipxe` and `assets/windows/*` immediately
@@ -86,6 +93,16 @@ The container picks up the new `nbxyz.ipxe` and `assets/windows/*` immediately
   2. Same condition → install `virtio-win-guest-tools.exe /S` silently.
   3. Launch CTT WinUtil interactively for any further debloat:
      `irm christitus.com/win | iex`.
+
+## Customising locale / timezone
+
+`windows/autounattend/autounattend.xml` defaults to **en-GB / GMT Standard
+Time** (UK English keyboard, GMT). Edit these tags before running
+`build.sh` if you want a different region:
+
+- `<UILanguage>`, `<SystemLocale>`, `<UserLocale>` — e.g. `en-US`, `de-DE`
+- `<InputLocale>` — keyboard layout code (e.g. `0409:00000409` for US)
+- `<TimeZone>` — Windows TZ ID (e.g. `Pacific Standard Time`)
 
 ## What's NOT in this repo
 

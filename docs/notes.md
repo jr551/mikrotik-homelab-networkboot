@@ -36,9 +36,9 @@ post-install agent install has to read from `C:\drivers`.
 
 ## SMB vs SCP on the Mikrotik
 
-SMB share `\\192.168.69.1\samsungssd2tb` is enabled but requires the SMB
-password. SSH key auth means we can SCP via `ssh-key` user `jr551` without
-prompting — that's what `build.sh` documents.
+SMB share `\\${ROUTER_HOST}\${STORAGE_VOLUME}` is enabled but requires the
+SMB password. SSH key auth lets `build.sh` SCP without prompting — set
+`ROUTER_USER` / `ROUTER_HOST` / `STORAGE_VOLUME` in `local.env`.
 
 SCP on the L009 (ARMv7) hits ~5-10 MB/s due to CPU-bound SSH encryption.
 A 7 GB upload takes 15-25 minutes.

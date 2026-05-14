@@ -2,7 +2,7 @@
 # nbxyz.ipxe - top-level custom menu, loaded by netbootxyz on boot.
 #
 # Replaces the default nbxyz.ipxe at:
-#   /samsungssd2tb/netbootxyz/config/menus/nbxyz.ipxe
+#   /<STORAGE_VOLUME>/netbootxyz/config/menus/nbxyz.ipxe
 #
 # Adds a "Local builds" section above the upstream endpoints so custom
 # images (Windows, etc) live alongside the public netboot.xyz menus.

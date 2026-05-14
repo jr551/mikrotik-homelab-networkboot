@@ -13,11 +13,19 @@
 
 set -euo pipefail
 
+REPO_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+
+# Load router config (gitignored).
+# shellcheck disable=SC1091
+[ -f "$REPO_DIR/local.env" ] && . "$REPO_DIR/local.env"
+
 WIN_ISO="${WIN_ISO:-$HOME/Downloads/Win11_25H2_EnglishInternational_x64_v2.iso}"
 OUT_DIR="${OUT_DIR:-$HOME/win11-netboot}"
 EDITION_INDEX="${EDITION_INDEX:-6}"
 VIRTIO_URL="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso"
-REPO_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+ROUTER_USER="${ROUTER_USER:-admin}"
+ROUTER_HOST="${ROUTER_HOST:-192.0.2.1}"
+STORAGE_VOLUME="${STORAGE_VOLUME:-usbstorage}"
 
 mkdir -p "$OUT_DIR"
 cd "$OUT_DIR"
@@ -81,5 +89,5 @@ echo
 echo "Build complete. Upload contents:"
 du -sh upload/
 echo
-echo "Next: copy upload/windows to /samsungssd2tb/netbootxyz/assets/windows on the Mikrotik."
-echo "  scp -r upload/windows/. jr551@192.168.69.1:samsungssd2tb/netbootxyz/assets/windows/"
+echo "Next: copy upload/windows to ${STORAGE_VOLUME}/netbootxyz/assets/windows on the router."
+echo "  scp -r upload/windows/. ${ROUTER_USER}@${ROUTER_HOST}:${STORAGE_VOLUME}/netbootxyz/assets/windows/"
