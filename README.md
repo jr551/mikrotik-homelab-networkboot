@@ -16,6 +16,10 @@ ipxe/                       iPXE menus served by the netbootxyz container
   nbxyz.ipxe                top-level menu (replaces upstream default)
   windows.ipxe              custom Windows installers submenu
 
+mac-host/                   alternative: serve everything from your Mac
+  serve.sh                  dnsmasq + http.server on an isolated ethernet
+  README.md                 wiring + troubleshooting
+
 windows/
   autounattend/
     autounattend.xml        injected into boot.wim image 2
@@ -28,6 +32,18 @@ windows/
 
 docs/                       wiring notes
 ```
+
+## Two ways to serve
+
+1. **Mikrotik (this repo's default)** — netboot.xyz container on the
+   router; assets on USB; the whole LAN can netboot. See *Deploying to
+   the router* below.
+2. **Mac-hosted (no router needed)** — plug the target PC into your
+   Mac's ethernet and run [`mac-host/serve.sh`](mac-host/README.md). The
+   Mac runs dnsmasq + HTTP on an isolated /24 and serves the WIMs
+   directly. Handy for one-off installs or when the router is busy.
+
+Both paths share the same WIMs produced by `build.sh`.
 
 ## Build flow
 
@@ -53,7 +69,7 @@ The script:
 7. Optimises (`wimoptimize --recompress`) to actually shrink the WIM.
 8. Assembles an `upload/` directory ready to SCP to the router.
 
-## Deploying to the Mikrotik
+## Deploying to the router
 
 The router needs:
 
