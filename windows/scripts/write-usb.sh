@@ -57,7 +57,8 @@ MOUNT_POINT="$(diskutil info "${TARGET}s2" | awk -F': +' '/Mount Point/ {print $
 echo "Volume mounted at: $MOUNT_POINT"
 
 echo "Copying installer contents (this takes a while)..."
-rsync -ah --info=progress2 "$STAGE/" "$MOUNT_POINT/"
+# macOS ships an older rsync without --info=progress2; --progress works fine.
+rsync -a --progress "$STAGE/" "$MOUNT_POINT/"
 
 echo "Syncing..."
 sync
